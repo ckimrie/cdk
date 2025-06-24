@@ -48,16 +48,16 @@ jobs:
         run: pnpm install --frozen-lockfile --frozen-lockfile
 
       - name: Format check
-        run: pnpm run format:check
+        run: pnpm format:check
 
       - name: Lint
-        run: pnpm run lint
+        run: pnpm lint
 
       - name: Type check
-        run: pnpm run build
+        run: pnpm build
 
       - name: Test
-        run: pnpm run test:coverage
+        run: pnpm test:coverage
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
