@@ -93,7 +93,7 @@ describe('ClientVpnWithCertificateAuth', () => {
 
     // Verify that the construct exposes the ovpn secret ARN
     expect(clientVpn.ovpnFileSecretArn).toBeDefined();
-    
+
     // Verify that the construct exposes the client VPN endpoint ID
     expect(clientVpn.clientVpnEndpointId).toBeDefined();
   });
@@ -112,25 +112,25 @@ describe('ClientVpnWithCertificateAuth', () => {
 
     // Should create 2 VPN endpoints
     template.resourceCountIs('AWS::EC2::ClientVpnEndpoint', 2);
-    
+
     // Should create 4 custom resources (2 for each VPN)
     template.resourceCountIs('AWS::CloudFormation::CustomResource', 4);
-    
+
     const lambdaFunctions = template.findResources('AWS::Lambda::Function');
-    
+
     // Should have our 2 singleton Lambda functions (certificate + ovpn generators)
     // Plus 2 CDK provider framework functions (singleton providers working!)
     // This means singletons are working for both business logic AND provider functions
     template.resourceCountIs('AWS::Lambda::Function', 4);
-    
+
     // Verify our singleton Lambda functions exist only once
-    const singletonCertificateGenerators = Object.keys(lambdaFunctions).filter(id => 
-      id.includes('VpnCertificateGeneratorSingleton')
+    const singletonCertificateGenerators = Object.keys(lambdaFunctions).filter(
+      id => id.includes('VpnCertificateGeneratorSingleton')
     );
-    const singletonOvpnGenerators = Object.keys(lambdaFunctions).filter(id => 
+    const singletonOvpnGenerators = Object.keys(lambdaFunctions).filter(id =>
       id.includes('VpnOvpnGeneratorSingleton')
     );
-    
+
     expect(singletonCertificateGenerators).toHaveLength(1);
     expect(singletonOvpnGenerators).toHaveLength(1);
   });
@@ -145,7 +145,7 @@ describe('ClientVpnWithCertificateAuth', () => {
     });
 
     const template = Template.fromStack(stack);
-    
+
     // Should use default CIDR block in VPN endpoint
     template.hasResourceProperties('AWS::EC2::ClientVpnEndpoint', {
       ClientCidrBlock: '10.0.0.0/16'
@@ -170,7 +170,7 @@ describe('ClientVpnWithCertificateAuth', () => {
     });
 
     const template = Template.fromStack(stack);
-    
+
     // Should use custom CIDR block in VPN endpoint
     template.hasResourceProperties('AWS::EC2::ClientVpnEndpoint', {
       ClientCidrBlock: '192.168.0.0/16'

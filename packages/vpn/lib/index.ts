@@ -15,11 +15,15 @@ export class ClientVpnWithCertificateAuth extends Construct {
   public readonly ovpnFileSecretArn: string;
   public readonly clientVpnEndpointId: string;
 
-  public constructor(scope: Construct, id: string, props: ClientVpnWithCertificateAuthProps) {
+  public constructor(
+    scope: Construct,
+    id: string,
+    props: ClientVpnWithCertificateAuthProps
+  ) {
     super(scope, id);
-    
+
     const { vpc, clientCidrBlock = '10.0.0.0/16' } = props;
-    
+
     // Create singleton Lambda function for certificate generation
     const certificateLambda = this.getOrCreateSingletonFunction(
       'VpnCertificateGeneratorSingleton',
@@ -53,9 +57,7 @@ export class ClientVpnWithCertificateAuth extends Construct {
       {
         policies: [
           new iam.PolicyStatement({
-            actions: [
-              'ec2:DescribeClientVpnEndpoints'
-            ],
+            actions: ['ec2:DescribeClientVpnEndpoints'],
             resources: ['*']
           }),
           new iam.PolicyStatement({
@@ -67,9 +69,7 @@ export class ClientVpnWithCertificateAuth extends Construct {
             resources: ['*']
           }),
           new iam.PolicyStatement({
-            actions: [
-              'ssm:GetParameter'
-            ],
+            actions: ['ssm:GetParameter'],
             resources: ['*']
           })
         ]
@@ -82,40 +82,54 @@ export class ClientVpnWithCertificateAuth extends Construct {
       certificateLambda
     );
 
-    const certificateResource = new cdk.CustomResource(this, 'CertificateResource', {
-      serviceToken: certificateProvider.serviceToken,
-      properties: {
-        Config: {
-          organizationName: 'VPN Organization',
-          organizationalUnit: 'IT Department',
-          country: 'US',
-          state: 'California',
-          city: 'San Francisco',
-          keySize: 2048,
-          validityPeriodDays: 365
+    const certificateResource = new cdk.CustomResource(
+      this,
+      'CertificateResource',
+      {
+        serviceToken: certificateProvider.serviceToken,
+        properties: {
+          Config: {
+            organizationName: 'VPN Organization',
+            organizationalUnit: 'IT Department',
+            country: 'US',
+            state: 'California',
+            city: 'San Francisco',
+            keySize: 2048,
+            validityPeriodDays: 365
+          }
         }
       }
-    });
+    );
 
     // Create Client VPN endpoint
-    const clientVpnEndpoint = new ec2.CfnClientVpnEndpoint(this, 'ClientVpnEndpoint', {
-      authenticationOptions: [{
-        type: 'certificate-authentication',
-        mutualAuthentication: {
-          clientRootCertificateChainArn: certificateResource.getAtt('CaCertificateArn').toString()
-        }
-      }],
-      clientCidrBlock: clientCidrBlock,
-      connectionLogOptions: {
-        enabled: false
-      },
-      serverCertificateArn: certificateResource.getAtt('ServerCertificateArn').toString(),
-      vpcId: vpc.vpcId,
-      transportProtocol: 'udp',
-      vpnPort: 443
-    });
+    const clientVpnEndpoint = new ec2.CfnClientVpnEndpoint(
+      this,
+      'ClientVpnEndpoint',
+      {
+        authenticationOptions: [
+          {
+            type: 'certificate-authentication',
+            mutualAuthentication: {
+              clientRootCertificateChainArn: certificateResource
+                .getAtt('CaCertificateArn')
+                .toString()
+            }
+          }
+        ],
+        clientCidrBlock: clientCidrBlock,
+        connectionLogOptions: {
+          enabled: false
+        },
+        serverCertificateArn: certificateResource
+          .getAtt('ServerCertificateArn')
+          .toString(),
+        vpcId: vpc.vpcId,
+        transportProtocol: 'udp',
+        vpnPort: 443
+      }
+    );
 
-    // Create custom resource for OVPN generation  
+    // Create custom resource for OVPN generation
     const ovpnProvider = this.getOrCreateSingletonProvider(
       'VpnOvpnProvider',
       ovpnLambda
@@ -150,10 +164,10 @@ export class ClientVpnWithCertificateAuth extends Construct {
     }
   ): lambda.Function {
     const constructName = `${singletonId}`;
-    
+
     // Find the stack to create singletons at stack level
     const stack = cdk.Stack.of(this);
-    
+
     // Check if singleton already exists in the stack
     const existing = stack.node.tryFindChild(constructName) as lambda.Function;
     if (existing) {
@@ -177,10 +191,10 @@ export class ClientVpnWithCertificateAuth extends Construct {
     handler: lambda.Function
   ): cr.Provider {
     const constructName = `${singletonId}`;
-    
+
     // Find the stack to create singletons at stack level
     const stack = cdk.Stack.of(this);
-    
+
     // Check if singleton already exists in the stack
     const existing = stack.node.tryFindChild(constructName) as cr.Provider;
     if (existing) {

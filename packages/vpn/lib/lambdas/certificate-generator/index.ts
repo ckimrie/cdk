@@ -1,12 +1,15 @@
 import { CertificateGeneratorEvent, CertificateGeneratorResult } from './types';
 import { generateCACertificateAsync } from './certificate-utils';
 
-export const handler = async (event: CertificateGeneratorEvent): Promise<CertificateGeneratorResult> => {
+export const handler = async (
+  event: CertificateGeneratorEvent
+): Promise<CertificateGeneratorResult> => {
   try {
     if (event.RequestType === 'Delete') {
       return {
         Status: 'SUCCESS',
-        PhysicalResourceId: event.PhysicalResourceId || 'certificate-generator-deleted'
+        PhysicalResourceId:
+          event.PhysicalResourceId || 'certificate-generator-deleted'
       } as CertificateGeneratorResult;
     }
 
@@ -22,7 +25,8 @@ export const handler = async (event: CertificateGeneratorEvent): Promise<Certifi
     return {
       Status: 'FAILED',
       Reason: error instanceof Error ? error.message : 'Unknown error',
-      PhysicalResourceId: event.PhysicalResourceId || 'certificate-generator-failed'
+      PhysicalResourceId:
+        event.PhysicalResourceId || 'certificate-generator-failed'
     } as CertificateGeneratorResult;
   }
 };

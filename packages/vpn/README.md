@@ -13,8 +13,8 @@ management and client configuration generation.
   CDK custom resources and Lambda functions
 - **Certificate-Based Mutual Authentication**: Support for mutual TLS authentication with automatic
   certificate provisioning
-- **Client Configuration Generation**: Automatically generates `.ovpn` files and stores them securely
-  in AWS Secrets Manager
+- **Client Configuration Generation**: Automatically generates `.ovpn` files and stores them
+  securely in AWS Secrets Manager
 - **Production Ready**: Built for enterprise use cases with comprehensive error handling and logging
 
 ## Installation
@@ -108,7 +108,8 @@ export class CustomVpnStack extends Stack {
 
 ### Using Custom Root CA
 
-If you have an existing root CA certificate and private key, you can use them instead of generating new ones:
+If you have an existing root CA certificate and private key, you can use them instead of generating
+new ones:
 
 ```typescript
 import { Stack, StackProps } from 'aws-cdk-lib';
@@ -127,8 +128,10 @@ export class CustomCaVpnStack extends Stack {
     const clientVpn = new ClientVpnWithCertificateAuth(this, 'CustomCaVpn', {
       vpc: vpc,
       rootCa: {
-        certificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012',
-        privateKeySecretArn: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:root-ca-private-key-AbCdEf'
+        certificateArn:
+          'arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012',
+        privateKeySecretArn:
+          'arn:aws:secretsmanager:us-east-1:123456789012:secret:root-ca-private-key-AbCdEf'
       },
       ovpnFileConfig: {
         clientCidr: '192.168.0.0/16',
@@ -172,11 +175,16 @@ new CfnOutput(this, 'ClientVpnEndpointId', {
 
 ### Complete VPN Setup with Subnet Associations
 
-While this construct creates the VPN endpoint and certificates, you'll need to add subnet associations and authorization rules manually:
+While this construct creates the VPN endpoint and certificates, you'll need to add subnet
+associations and authorization rules manually:
 
 ```typescript
 import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
-import { Vpc, CfnClientVpnTargetNetworkAssociation, CfnClientVpnAuthorizationRule } from 'aws-cdk-lib/aws-ec2';
+import {
+  Vpc,
+  CfnClientVpnTargetNetworkAssociation,
+  CfnClientVpnAuthorizationRule
+} from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 import { ClientVpnWithCertificateAuth } from '@ckimrie/vpn';
 
@@ -249,12 +257,12 @@ The main construct for creating AWS Client VPN endpoints with certificate-based 
 
 #### Props (`ClientVpnWithCertificateAuthProps`)
 
-| Property             | Type                | Required | Description                                              |
-| -------------------- | ------------------- | -------- | -------------------------------------------------------- |
-| `vpc`                | `ec2.IVpc`          | Yes      | The VPC where the Client VPN will be deployed           |
-| `rootCa`             | `CustomRootCa`      | No       | Existing root CA certificate and private key            |
-| `certificateConfig`  | `CertificateConfig` | No       | Configuration for certificate generation                 |
-| `ovpnFileConfig`     | `OvpnFileConfig`    | No       | Configuration for the generated .ovpn file              |
+| Property            | Type                | Required | Description                                   |
+| ------------------- | ------------------- | -------- | --------------------------------------------- |
+| `vpc`               | `ec2.IVpc`          | Yes      | The VPC where the Client VPN will be deployed |
+| `rootCa`            | `CustomRootCa`      | No       | Existing root CA certificate and private key  |
+| `certificateConfig` | `CertificateConfig` | No       | Configuration for certificate generation      |
+| `ovpnFileConfig`    | `OvpnFileConfig`    | No       | Configuration for the generated .ovpn file    |
 
 #### Properties
 
@@ -267,41 +275,43 @@ The main construct for creating AWS Client VPN endpoints with certificate-based 
 
 Configuration for certificate generation:
 
-| Property              | Type                        | Default                     | Description                              |
-| --------------------- | --------------------------- | --------------------------- | ---------------------------------------- |
-| `organizationName`    | `string`                    | "Client VPN Organization"   | Certificate organization name            |
-| `organizationalUnit`  | `string`                    | "IT Department"             | Certificate organizational unit          |
-| `country`             | `string`                    | "US"                        | Certificate country code                 |
-| `state`               | `string`                    | "California"                | Certificate state/province               |
-| `city`                | `string`                    | "San Francisco"             | Certificate city/locality                |
-| `keySize`             | `2048 \| 3072 \| 4096`      | `2048`                      | RSA key size in bits                     |
-| `validityPeriodDays`  | `number`                    | `365`                       | Certificate validity period in days      |
+| Property             | Type                   | Default                   | Description                         |
+| -------------------- | ---------------------- | ------------------------- | ----------------------------------- |
+| `organizationName`   | `string`               | "Client VPN Organization" | Certificate organization name       |
+| `organizationalUnit` | `string`               | "IT Department"           | Certificate organizational unit     |
+| `country`            | `string`               | "US"                      | Certificate country code            |
+| `state`              | `string`               | "California"              | Certificate state/province          |
+| `city`               | `string`               | "San Francisco"           | Certificate city/locality           |
+| `keySize`            | `2048 \| 3072 \| 4096` | `2048`                    | RSA key size in bits                |
+| `validityPeriodDays` | `number`               | `365`                     | Certificate validity period in days |
 
 #### `CustomRootCa`
 
 Existing root CA configuration:
 
-| Property               | Type     | Description                                    |
-| ---------------------- | -------- | ---------------------------------------------- |
-| `certificateArn`       | `string` | ARN of the root CA certificate in ACM         |
-| `privateKeySecretArn`  | `string` | ARN of the root CA private key in Secrets Manager |
+| Property              | Type     | Description                                       |
+| --------------------- | -------- | ------------------------------------------------- |
+| `certificateArn`      | `string` | ARN of the root CA certificate in ACM             |
+| `privateKeySecretArn` | `string` | ARN of the root CA private key in Secrets Manager |
 
 #### `OvpnFileConfig`
 
 Configuration for the generated .ovpn file:
 
-| Property       | Type               | Default        | Description                              |
-| -------------- | ------------------ | -------------- | ---------------------------------------- |
-| `clientCidr`   | `string`           | "10.0.0.0/16"  | CIDR block for VPN client IP addresses  |
-| `serverPort`   | `number`           | `443`          | VPN server port                          |
-| `protocol`     | `'udp' \| 'tcp'`   | "udp"          | VPN protocol                             |
-| `splitTunnel`  | `boolean`          | `true`         | Enable split tunneling                   |
+| Property      | Type             | Default       | Description                            |
+| ------------- | ---------------- | ------------- | -------------------------------------- |
+| `clientCidr`  | `string`         | "10.0.0.0/16" | CIDR block for VPN client IP addresses |
+| `serverPort`  | `number`         | `443`         | VPN server port                        |
+| `protocol`    | `'udp' \| 'tcp'` | "udp"         | VPN protocol                           |
+| `splitTunnel` | `boolean`        | `true`        | Enable split tunneling                 |
 
 ## How It Works
 
-The construct automates the complete setup of an AWS Client VPN with certificate-based authentication:
+The construct automates the complete setup of an AWS Client VPN with certificate-based
+authentication:
 
-1. **Certificate Generation**: Creates a root CA certificate and private key using OpenSSL in a Lambda function
+1. **Certificate Generation**: Creates a root CA certificate and private key using OpenSSL in a
+   Lambda function
 2. **Certificate Import**: Imports the root CA certificate into AWS Certificate Manager (ACM)
 3. **Server Certificate**: Generates and imports a server certificate signed by the root CA
 4. **Client Certificates**: Generates client certificates and private keys for VPN access
@@ -315,11 +325,12 @@ The construct automatically handles certificate lifecycle:
 
 - **Algorithm**: RSA with configurable key sizes (2048, 3072, 4096 bits)
 - **Generation**: Uses OpenSSL via AWS Lambda custom resource
-- **Storage**: 
+- **Storage**:
   - Root CA and server certificates stored in AWS Certificate Manager (ACM)
   - Client certificates and private keys stored in AWS Systems Manager Parameter Store
   - Complete .ovpn file stored in AWS Secrets Manager
-- **Security**: All private keys are encrypted at rest and only accessible through AWS IAM permissions
+- **Security**: All private keys are encrypted at rest and only accessible through AWS IAM
+  permissions
 
 ## Troubleshooting
 
@@ -327,7 +338,8 @@ The construct automatically handles certificate lifecycle:
 
 **Certificate Generation Fails**
 
-- Ensure Lambda execution role has ACM permissions (`acm:ImportCertificate`, `acm:DescribeCertificate`)
+- Ensure Lambda execution role has ACM permissions (`acm:ImportCertificate`,
+  `acm:DescribeCertificate`)
 - Check CloudWatch logs for the certificate generator Lambda function
 - Verify OpenSSL execution in the Lambda environment
 
@@ -363,7 +375,7 @@ Example log inspection:
 # View certificate generation logs
 aws logs tail /aws/lambda/VpnCertificateGeneratorSingleton --follow
 
-# View .ovpn generation logs  
+# View .ovpn generation logs
 aws logs tail /aws/lambda/VpnOvpnGeneratorSingleton --follow
 ```
 
@@ -410,10 +422,14 @@ sudo openvpn --config client.ovpn
 
 ### Important Notes
 
-- **Subnet Associations**: Remember to associate your VPN endpoint with subnets using `CfnClientVpnTargetNetworkAssociation`
-- **Authorization Rules**: Add authorization rules using `CfnClientVpnAuthorizationRule` to allow access to networks
-- **Security**: The .ovpn file contains sensitive key material - store it securely and don't share it
-- **Client Certificate**: Each .ovpn file contains a unique client certificate for individual user identification
+- **Subnet Associations**: Remember to associate your VPN endpoint with subnets using
+  `CfnClientVpnTargetNetworkAssociation`
+- **Authorization Rules**: Add authorization rules using `CfnClientVpnAuthorizationRule` to allow
+  access to networks
+- **Security**: The .ovpn file contains sensitive key material - store it securely and don't share
+  it
+- **Client Certificate**: Each .ovpn file contains a unique client certificate for individual user
+  identification
 
 ## Contributing
 

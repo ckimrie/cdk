@@ -4,9 +4,13 @@ export const extractVpnEndpointDns = (endpoints: any[]): string => {
   }
 
   const endpoint = endpoints[0];
-  
+
   if (!endpoint.Status || endpoint.Status.Code !== 'available') {
-    throw new Error(`Client VPN endpoint is not available. Current status: ${endpoint.Status?.Code || 'undefined'}`);
+    throw new Error(
+      `Client VPN endpoint is not available. Current status: ${
+        endpoint.Status?.Code || 'undefined'
+      }`
+    );
   }
 
   if (!endpoint.DnsName || endpoint.DnsName === '') {

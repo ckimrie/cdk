@@ -2,8 +2,14 @@ import * as crypto from 'crypto';
 import * as forge from 'node-forge';
 import { handler as certificateHandler } from '../../lib/lambdas/certificate-generator';
 import { handler as ovpnHandler } from '../../lib/lambdas/ovpn-generator';
-import { CertificateGeneratorEvent, CertificateGeneratorResult } from '../../lib/lambdas/certificate-generator/types';
-import { OvpnGeneratorEvent, OvpnGeneratorResult } from '../../lib/lambdas/ovpn-generator/types';
+import {
+  CertificateGeneratorEvent,
+  CertificateGeneratorResult
+} from '../../lib/lambdas/certificate-generator/types';
+import {
+  OvpnGeneratorEvent,
+  OvpnGeneratorResult
+} from '../../lib/lambdas/ovpn-generator/types';
 
 // Mock AWS SDK with shared state between certificate and ovpn generators
 const mockParameters: Record<string, string> = {};
@@ -13,16 +19,18 @@ jest.mock('aws-sdk', () => ({
   ACM: jest.fn().mockImplementation(() => ({
     importCertificate: jest.fn().mockImplementation(() => ({
       promise: jest.fn().mockResolvedValue({
-        CertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/' + crypto.randomUUID()
+        CertificateArn:
+          'arn:aws:acm:us-east-1:123456789012:certificate/' +
+          crypto.randomUUID()
       })
     }))
   })),
   SSM: jest.fn().mockImplementation(() => ({
-    putParameter: jest.fn().mockImplementation((params) => {
+    putParameter: jest.fn().mockImplementation(params => {
       mockParameters[params.Name] = params.Value;
       return { promise: jest.fn().mockResolvedValue({}) };
     }),
-    getParameter: jest.fn().mockImplementation((params) => ({
+    getParameter: jest.fn().mockImplementation(params => ({
       promise: jest.fn().mockResolvedValue({
         Parameter: {
           Value: mockParameters[params.Name] || 'mock-value'
@@ -33,17 +41,24 @@ jest.mock('aws-sdk', () => ({
   EC2: jest.fn().mockImplementation(() => ({
     describeClientVpnEndpoints: jest.fn().mockImplementation(() => ({
       promise: jest.fn().mockResolvedValue({
-        ClientVpnEndpoints: [{
-          ClientVpnEndpointId: 'cvpn-endpoint-12345',
-          DnsName: 'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com',
-          Status: { Code: 'available' }
-        }]
+        ClientVpnEndpoints: [
+          {
+            ClientVpnEndpointId: 'cvpn-endpoint-12345',
+            DnsName:
+              'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com',
+            Status: { Code: 'available' }
+          }
+        ]
       })
     }))
   })),
   SecretsManager: jest.fn().mockImplementation(() => ({
-    createSecret: jest.fn().mockImplementation((params) => {
-      const secretArn = 'arn:aws:secretsmanager:us-east-1:123456789012:secret:' + params.Name + '-' + crypto.randomUUID();
+    createSecret: jest.fn().mockImplementation(params => {
+      const secretArn =
+        'arn:aws:secretsmanager:us-east-1:123456789012:secret:' +
+        params.Name +
+        '-' +
+        crypto.randomUUID();
       mockSecrets[secretArn] = params.SecretString;
       return {
         promise: jest.fn().mockResolvedValue({
@@ -77,7 +92,9 @@ const getMockCertificateEvent = (): CertificateGeneratorEvent => ({
   }
 });
 
-const getMockOvpnEvent = (certificateResourceId: string): OvpnGeneratorEvent => ({
+const getMockOvpnEvent = (
+  certificateResourceId: string
+): OvpnGeneratorEvent => ({
   RequestType: 'Create',
   ResponseURL: 'https://example.com/response',
   StackId: 'arn:aws:cloudformation:us-east-1:123456789012:stack/test-stack',
@@ -106,7 +123,9 @@ describe('End-to-End Certificate + OVPN Integration', () => {
   it('should generate certificates and create working .ovpn file', async () => {
     // Step 1: Generate certificates
     const certificateEvent = getMockCertificateEvent();
-    const certificateResult = await certificateHandler(certificateEvent) as CertificateGeneratorResult;
+    const certificateResult = (await certificateHandler(
+      certificateEvent
+    )) as CertificateGeneratorResult;
 
     expect(certificateResult.Status).toBe('SUCCESS');
     expect(certificateResult.PhysicalResourceId).toBeDefined();
@@ -122,7 +141,7 @@ describe('End-to-End Certificate + OVPN Integration', () => {
 
     // Step 2: Generate .ovpn file using the certificate resource ID
     const ovpnEvent = getMockOvpnEvent(certificateResult.PhysicalResourceId);
-    const ovpnResult = await ovpnHandler(ovpnEvent) as OvpnGeneratorResult;
+    const ovpnResult = (await ovpnHandler(ovpnEvent)) as OvpnGeneratorResult;
 
     expect(ovpnResult.Status).toBe('SUCCESS');
     expect(ovpnResult.Data.OvpnFileContent).toBeDefined();
@@ -135,7 +154,9 @@ describe('End-to-End Certificate + OVPN Integration', () => {
     expect(ovpnContent).toContain('client');
     expect(ovpnContent).toContain('dev tun');
     expect(ovpnContent).toContain('proto udp');
-    expect(ovpnContent).toContain('remote cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com 443');
+    expect(ovpnContent).toContain(
+      'remote cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com 443'
+    );
 
     // Check embedded certificates
     expect(ovpnContent).toContain('<ca>');
@@ -147,13 +168,22 @@ describe('End-to-End Certificate + OVPN Integration', () => {
 
     // Verify the certificates in the .ovpn file match the generated ones
     // Extract key certificate data (without headers/footers for comparison)
-    const caCertData = caCert.replace(/-----BEGIN CERTIFICATE-----\s*/, '').replace(/\s*-----END CERTIFICATE-----\s*/, '').replace(/\s/g, '');
-    const clientCertData = clientCert.replace(/-----BEGIN CERTIFICATE-----\s*/, '').replace(/\s*-----END CERTIFICATE-----\s*/, '').replace(/\s/g, '');
-    const clientKeyData = clientKey.replace(/-----BEGIN (RSA )?PRIVATE KEY-----\s*/, '').replace(/\s*-----END (RSA )?PRIVATE KEY-----\s*/, '').replace(/\s/g, '');
-    
+    const caCertData = caCert
+      .replace(/-----BEGIN CERTIFICATE-----\s*/, '')
+      .replace(/\s*-----END CERTIFICATE-----\s*/, '')
+      .replace(/\s/g, '');
+    const clientCertData = clientCert
+      .replace(/-----BEGIN CERTIFICATE-----\s*/, '')
+      .replace(/\s*-----END CERTIFICATE-----\s*/, '')
+      .replace(/\s/g, '');
+    const clientKeyData = clientKey
+      .replace(/-----BEGIN (RSA )?PRIVATE KEY-----\s*/, '')
+      .replace(/\s*-----END (RSA )?PRIVATE KEY-----\s*/, '')
+      .replace(/\s/g, '');
+
     // Remove all whitespace from .ovpn content for comparison
     const normalizedOvpnContent = ovpnContent.replace(/\s/g, '');
-    
+
     expect(normalizedOvpnContent).toContain(caCertData);
     expect(normalizedOvpnContent).toContain(clientCertData);
     expect(normalizedOvpnContent).toContain(clientKeyData);
@@ -162,7 +192,9 @@ describe('End-to-End Certificate + OVPN Integration', () => {
   it('should handle different VPN configurations correctly', async () => {
     // Generate certificates first
     const certificateEvent = getMockCertificateEvent();
-    const certificateResult = await certificateHandler(certificateEvent) as CertificateGeneratorResult;
+    const certificateResult = (await certificateHandler(
+      certificateEvent
+    )) as CertificateGeneratorResult;
 
     // Test TCP configuration with no split tunnel
     const tcpOvpnEvent: OvpnGeneratorEvent = {
@@ -179,28 +211,38 @@ describe('End-to-End Certificate + OVPN Integration', () => {
       }
     };
 
-    const tcpOvpnResult = await ovpnHandler(tcpOvpnEvent) as OvpnGeneratorResult;
+    const tcpOvpnResult = (await ovpnHandler(
+      tcpOvpnEvent
+    )) as OvpnGeneratorResult;
 
     expect(tcpOvpnResult.Status).toBe('SUCCESS');
-    
+
     const tcpOvpnContent = tcpOvpnResult.Data.OvpnFileContent;
     expect(tcpOvpnContent).toContain('proto tcp');
-    expect(tcpOvpnContent).toContain('remote cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com 1194');
+    expect(tcpOvpnContent).toContain(
+      'remote cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com 1194'
+    );
     expect(tcpOvpnContent).toContain('redirect-gateway def1'); // No split tunnel
   });
 
   it('should validate certificate chain in .ovpn file', async () => {
     // Generate certificates
     const certificateEvent = getMockCertificateEvent();
-    const certificateResult = await certificateHandler(certificateEvent) as CertificateGeneratorResult;
+    const certificateResult = (await certificateHandler(
+      certificateEvent
+    )) as CertificateGeneratorResult;
 
     // Generate .ovpn file
     const ovpnEvent = getMockOvpnEvent(certificateResult.PhysicalResourceId);
-    const ovpnResult = await ovpnHandler(ovpnEvent) as OvpnGeneratorResult;
+    const ovpnResult = (await ovpnHandler(ovpnEvent)) as OvpnGeneratorResult;
 
     // Parse certificates from both sources
-    const originalCaCert = forge.pki.certificateFromPem(certificateResult.Data.CaCertificatePem);
-    const originalClientCert = forge.pki.certificateFromPem(certificateResult.Data.ClientCertificatePem);
+    const originalCaCert = forge.pki.certificateFromPem(
+      certificateResult.Data.CaCertificatePem
+    );
+    const originalClientCert = forge.pki.certificateFromPem(
+      certificateResult.Data.ClientCertificatePem
+    );
 
     // Extract certificates from .ovpn file
     const ovpnContent = ovpnResult.Data.OvpnFileContent;
@@ -214,8 +256,12 @@ describe('End-to-End Certificate + OVPN Integration', () => {
     const ovpnClientCert = forge.pki.certificateFromPem(certSection![1]);
 
     // Verify certificates match
-    expect(ovpnCaCert.subject.getField('CN').value).toBe(originalCaCert.subject.getField('CN').value);
-    expect(ovpnClientCert.subject.getField('CN').value).toBe(originalClientCert.subject.getField('CN').value);
+    expect(ovpnCaCert.subject.getField('CN').value).toBe(
+      originalCaCert.subject.getField('CN').value
+    );
+    expect(ovpnClientCert.subject.getField('CN').value).toBe(
+      originalClientCert.subject.getField('CN').value
+    );
 
     // Verify certificate chain
     expect(ovpnClientCert.issuer.getField('CN').value).toBe('VPN-CA');
@@ -225,15 +271,17 @@ describe('End-to-End Certificate + OVPN Integration', () => {
   it('should store .ovpn file in Secrets Manager', async () => {
     // Generate certificates
     const certificateEvent = getMockCertificateEvent();
-    const certificateResult = await certificateHandler(certificateEvent) as CertificateGeneratorResult;
+    const certificateResult = (await certificateHandler(
+      certificateEvent
+    )) as CertificateGeneratorResult;
 
     // Generate .ovpn file
     const ovpnEvent = getMockOvpnEvent(certificateResult.PhysicalResourceId);
-    const ovpnResult = await ovpnHandler(ovpnEvent) as OvpnGeneratorResult;
+    const ovpnResult = (await ovpnHandler(ovpnEvent)) as OvpnGeneratorResult;
 
     // Verify .ovpn file was stored in Secrets Manager
     expect(ovpnResult.Data.OvpnSecretArn).toMatch(/^arn:aws:secretsmanager:/);
-    
+
     // Verify the secret contains the .ovpn content
     const secretContent = mockSecrets[ovpnResult.Data.OvpnSecretArn];
     expect(secretContent).toBe(ovpnResult.Data.OvpnFileContent);
@@ -242,16 +290,24 @@ describe('End-to-End Certificate + OVPN Integration', () => {
   it('should use real certificates that are AWS ACM compatible', async () => {
     // Generate certificates
     const certificateEvent = getMockCertificateEvent();
-    const certificateResult = await certificateHandler(certificateEvent) as CertificateGeneratorResult;
+    const certificateResult = (await certificateHandler(
+      certificateEvent
+    )) as CertificateGeneratorResult;
 
     // Verify all certificates are valid PEM format
     const caCert = certificateResult.Data.CaCertificatePem;
     const serverCert = certificateResult.Data.ServerCertificatePem;
     const clientCert = certificateResult.Data.ClientCertificatePem;
 
-    expect(caCert).toMatch(/^-----BEGIN CERTIFICATE-----[\s\S]*-----END CERTIFICATE-----\s*$/);
-    expect(serverCert).toMatch(/^-----BEGIN CERTIFICATE-----[\s\S]*-----END CERTIFICATE-----\s*$/);
-    expect(clientCert).toMatch(/^-----BEGIN CERTIFICATE-----[\s\S]*-----END CERTIFICATE-----\s*$/);
+    expect(caCert).toMatch(
+      /^-----BEGIN CERTIFICATE-----[\s\S]*-----END CERTIFICATE-----\s*$/
+    );
+    expect(serverCert).toMatch(
+      /^-----BEGIN CERTIFICATE-----[\s\S]*-----END CERTIFICATE-----\s*$/
+    );
+    expect(clientCert).toMatch(
+      /^-----BEGIN CERTIFICATE-----[\s\S]*-----END CERTIFICATE-----\s*$/
+    );
 
     // Parse and validate certificate properties
     const parsedCaCert = forge.pki.certificateFromPem(caCert);

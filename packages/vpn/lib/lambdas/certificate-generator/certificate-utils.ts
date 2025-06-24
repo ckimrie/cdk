@@ -14,7 +14,9 @@ export const generateCACertificate = (config: CertificateConfig) => {
   caCert.serialNumber = '01';
   caCert.validity.notBefore = new Date();
   caCert.validity.notAfter = new Date();
-  caCert.validity.notAfter.setDate(caCert.validity.notBefore.getDate() + config.validityPeriodDays);
+  caCert.validity.notAfter.setDate(
+    caCert.validity.notBefore.getDate() + config.validityPeriodDays
+  );
 
   const caAttrs = [
     { type: '2.5.4.3', value: 'VPN-CA' }, // commonName
@@ -24,7 +26,7 @@ export const generateCACertificate = (config: CertificateConfig) => {
     { type: '2.5.4.8', value: config.state }, // stateOrProvinceName
     { type: '2.5.4.7', value: config.city } // localityName
   ];
-  
+
   caCert.subject.attributes.push(...caAttrs);
   caCert.issuer.attributes.push(...caAttrs);
 
@@ -56,7 +58,9 @@ export const generateCACertificateAsync = async (config: CertificateConfig) => {
   caCert.serialNumber = '01';
   caCert.validity.notBefore = new Date();
   caCert.validity.notAfter = new Date();
-  caCert.validity.notAfter.setDate(caCert.validity.notBefore.getDate() + config.validityPeriodDays);
+  caCert.validity.notAfter.setDate(
+    caCert.validity.notBefore.getDate() + config.validityPeriodDays
+  );
 
   const caAttrs = [
     { type: '2.5.4.3', value: 'VPN-CA' }, // commonName
@@ -66,7 +70,7 @@ export const generateCACertificateAsync = async (config: CertificateConfig) => {
     { type: '2.5.4.8', value: config.state }, // stateOrProvinceName
     { type: '2.5.4.7', value: config.city } // localityName
   ];
-  
+
   caCert.subject.attributes.push(...caAttrs);
   caCert.issuer.attributes.push(...caAttrs);
 
@@ -87,7 +91,9 @@ export const generateCACertificateAsync = async (config: CertificateConfig) => {
   serverCert.serialNumber = '02';
   serverCert.validity.notBefore = new Date();
   serverCert.validity.notAfter = new Date();
-  serverCert.validity.notAfter.setDate(serverCert.validity.notBefore.getDate() + config.validityPeriodDays);
+  serverCert.validity.notAfter.setDate(
+    serverCert.validity.notBefore.getDate() + config.validityPeriodDays
+  );
 
   const serverAttrs = [
     { type: '2.5.4.3', value: 'server' }, // commonName
@@ -127,7 +133,9 @@ export const generateCACertificateAsync = async (config: CertificateConfig) => {
   clientCert.serialNumber = '03';
   clientCert.validity.notBefore = new Date();
   clientCert.validity.notAfter = new Date();
-  clientCert.validity.notAfter.setDate(clientCert.validity.notBefore.getDate() + config.validityPeriodDays);
+  clientCert.validity.notAfter.setDate(
+    clientCert.validity.notBefore.getDate() + config.validityPeriodDays
+  );
 
   const clientAttrs = [
     { type: '2.5.4.3', value: 'client' }, // commonName
@@ -168,45 +176,59 @@ export const generateCACertificateAsync = async (config: CertificateConfig) => {
   const clientPrivateKeyPem = forge.pki.privateKeyToPem(clientKeys.privateKey);
 
   // Import certificates to ACM
-  const caImportResult = await acm.importCertificate({
-    Certificate: caCertPem,
-    PrivateKey: caPrivateKeyPem
-  }).promise();
+  const caImportResult = await acm
+    .importCertificate({
+      Certificate: caCertPem,
+      PrivateKey: caPrivateKeyPem
+    })
+    .promise();
 
-  const serverImportResult = await acm.importCertificate({
-    Certificate: serverCertPem,
-    PrivateKey: serverPrivateKeyPem
-  }).promise();
+  const serverImportResult = await acm
+    .importCertificate({
+      Certificate: serverCertPem,
+      PrivateKey: serverPrivateKeyPem
+    })
+    .promise();
 
-  const clientImportResult = await acm.importCertificate({
-    Certificate: clientCertPem,
-    PrivateKey: clientPrivateKeyPem
-  }).promise();
+  const clientImportResult = await acm
+    .importCertificate({
+      Certificate: clientCertPem,
+      PrivateKey: clientPrivateKeyPem
+    })
+    .promise();
 
   // Store certificates in SSM for later use
   const resourceId = `certificate-generator-${new Date().getTime()}`;
-  
+
   await Promise.all([
-    ssm.putParameter({
-      Name: `/vpn/${resourceId}/ca-certificate`,
-      Value: caCertPem,
-      Type: 'String'
-    }).promise(),
-    ssm.putParameter({
-      Name: `/vpn/${resourceId}/ca-private-key`,
-      Value: caPrivateKeyPem,
-      Type: 'SecureString'
-    }).promise(),
-    ssm.putParameter({
-      Name: `/vpn/${resourceId}/client-certificate`,
-      Value: clientCertPem,
-      Type: 'String'
-    }).promise(),
-    ssm.putParameter({
-      Name: `/vpn/${resourceId}/client-private-key`,
-      Value: clientPrivateKeyPem,
-      Type: 'SecureString'
-    }).promise()
+    ssm
+      .putParameter({
+        Name: `/vpn/${resourceId}/ca-certificate`,
+        Value: caCertPem,
+        Type: 'String'
+      })
+      .promise(),
+    ssm
+      .putParameter({
+        Name: `/vpn/${resourceId}/ca-private-key`,
+        Value: caPrivateKeyPem,
+        Type: 'SecureString'
+      })
+      .promise(),
+    ssm
+      .putParameter({
+        Name: `/vpn/${resourceId}/client-certificate`,
+        Value: clientCertPem,
+        Type: 'String'
+      })
+      .promise(),
+    ssm
+      .putParameter({
+        Name: `/vpn/${resourceId}/client-private-key`,
+        Value: clientPrivateKeyPem,
+        Type: 'SecureString'
+      })
+      .promise()
   ]);
 
   return {

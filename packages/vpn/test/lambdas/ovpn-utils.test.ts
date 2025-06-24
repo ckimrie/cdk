@@ -3,15 +3,19 @@ import { extractVpnEndpointDns } from '../../lib/lambdas/ovpn-generator/ovpn-uti
 describe('OVPN Utility Functions', () => {
   describe('extractVpnEndpointDns', () => {
     it('should extract DNS name from available VPN endpoint', () => {
-      const endpoints = [{
-        ClientVpnEndpointId: 'cvpn-endpoint-12345',
-        Status: { Code: 'available' },
-        DnsName: 'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com'
-      }];
+      const endpoints = [
+        {
+          ClientVpnEndpointId: 'cvpn-endpoint-12345',
+          Status: { Code: 'available' },
+          DnsName: 'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com'
+        }
+      ];
 
       const dnsName = extractVpnEndpointDns(endpoints);
 
-      expect(dnsName).toBe('cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com');
+      expect(dnsName).toBe(
+        'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com'
+      );
     });
 
     it('should throw error when no endpoints are provided', () => {
@@ -33,23 +37,29 @@ describe('OVPN Utility Functions', () => {
     });
 
     it('should throw error when VPN endpoint is not available', () => {
-      const endpoints = [{
-        ClientVpnEndpointId: 'cvpn-endpoint-12345',
-        Status: { Code: 'pending-associate' },
-        DnsName: 'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com'
-      }];
+      const endpoints = [
+        {
+          ClientVpnEndpointId: 'cvpn-endpoint-12345',
+          Status: { Code: 'pending-associate' },
+          DnsName: 'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com'
+        }
+      ];
 
       expect(() => {
         extractVpnEndpointDns(endpoints);
-      }).toThrow('Client VPN endpoint is not available. Current status: pending-associate');
+      }).toThrow(
+        'Client VPN endpoint is not available. Current status: pending-associate'
+      );
     });
 
     it('should throw error when VPN endpoint has no DNS name', () => {
-      const endpoints = [{
-        ClientVpnEndpointId: 'cvpn-endpoint-12345',
-        Status: { Code: 'available' },
-        DnsName: undefined
-      }];
+      const endpoints = [
+        {
+          ClientVpnEndpointId: 'cvpn-endpoint-12345',
+          Status: { Code: 'available' },
+          DnsName: undefined
+        }
+      ];
 
       expect(() => {
         extractVpnEndpointDns(endpoints);
@@ -57,11 +67,13 @@ describe('OVPN Utility Functions', () => {
     });
 
     it('should throw error when VPN endpoint has empty DNS name', () => {
-      const endpoints = [{
-        ClientVpnEndpointId: 'cvpn-endpoint-12345',
-        Status: { Code: 'available' },
-        DnsName: ''
-      }];
+      const endpoints = [
+        {
+          ClientVpnEndpointId: 'cvpn-endpoint-12345',
+          Status: { Code: 'available' },
+          DnsName: ''
+        }
+      ];
 
       expect(() => {
         extractVpnEndpointDns(endpoints);
@@ -69,15 +81,19 @@ describe('OVPN Utility Functions', () => {
     });
 
     it('should handle endpoint without status field', () => {
-      const endpoints = [{
-        ClientVpnEndpointId: 'cvpn-endpoint-12345',
-        Status: undefined,
-        DnsName: 'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com'
-      }];
+      const endpoints = [
+        {
+          ClientVpnEndpointId: 'cvpn-endpoint-12345',
+          Status: undefined,
+          DnsName: 'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com'
+        }
+      ];
 
       expect(() => {
         extractVpnEndpointDns(endpoints);
-      }).toThrow('Client VPN endpoint is not available. Current status: undefined');
+      }).toThrow(
+        'Client VPN endpoint is not available. Current status: undefined'
+      );
     });
   });
 });

@@ -5,13 +5,6 @@
     "rootDir": "lib",
     "composite": true
   },
-  "include": [
-    "lib/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "test/**/*",
-    "coverage/**/*"
-  ]
+  "include": ["lib/**/*"],
+  "exclude": ["node_modules", "dist", "test/**/*", "coverage/**/*"]
 }
