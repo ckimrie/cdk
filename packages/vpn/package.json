@@ -1,0 +1,53 @@
+{
+  "name": "@ckimrie/cdk-vpn",
+  "version": "0.1.0",
+  "description": "AWS CDK construct for simplified Client VPN setup with automatic certificate management and authentication options",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "author": "Christopher Imrie",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ckimrie/cdk.git",
+    "directory": "packages/vpn"
+  },
+  "keywords": [
+    "aws",
+    "cdk",
+    "vpn",
+    "client-vpn",
+    "aws-client-vpn",
+    "certificates",
+    "networking",
+    "aws-cdk-construct"
+  ],
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
+    "clean": "rm -rf lib coverage",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node-forge": "^1.3.11",
+    "aws-sdk": "^2.1500.0"
+  },
+  "peerDependencies": {
+    "aws-cdk-lib": "2.194.0",
+    "constructs": "^10.0.0"
+  },
+  "dependencies": {
+    "node-forge": "^1.3.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
