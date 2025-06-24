@@ -1,3 +1,5 @@
 packages:
   # All packages in the packages directory
   - 'packages/*'
+  # Test CDK app for CI/CD validation
+  - 'test-app'

@@ -1,18 +1,17 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "lib",
-    "rootDir": ".",
+    "outDir": "dist",
+    "rootDir": "lib",
     "composite": true
   },
   "include": [
-    "lib/**/*",
-    "test/**/*"
+    "lib/**/*"
   ],
   "exclude": [
     "node_modules",
-    "lib/**/*.d.ts",
-    "lib/**/*.js",
-    "test/lambdas/certificate-generator-debug.test.ts"
+    "dist",
+    "test/**/*",
+    "coverage/**/*"
   ]
 }

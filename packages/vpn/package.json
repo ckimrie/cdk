@@ -2,13 +2,13 @@
   "name": "@ckimrie/cdk-vpn",
   "version": "0.1.0",
   "description": "AWS CDK construct for simplified Client VPN setup with automatic certificate management and authentication options",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Christopher Imrie",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ckimrie/cdk.git",
+    "url": "https://github.com/ckimrie/vpn.git",
     "directory": "packages/vpn"
   },
   "keywords": [
@@ -22,8 +22,14 @@
     "aws-cdk-construct"
   ],
   "files": [
-    "lib/**/*"
+    "dist/**/*",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
@@ -33,7 +39,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
-    "clean": "rm -rf lib coverage",
+    "clean": "rm -rf dist coverage",
     "prepare": "npm run build"
   },
   "devDependencies": {

@@ -1,0 +1,20 @@
+{
+  "name": "test-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Test CDK app for CI/CD validation",
+  "scripts": {
+    "synth": "cdk synth",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.194.0",
+    "constructs": "^10.0.0",
+    "@ckimrie/cdk-vpn": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "aws-cdk": "^2.1019.0",
+    "typescript": "^5.0.0"
+  }
+}

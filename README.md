@@ -109,6 +109,16 @@ This project follows strict development practices:
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
 
+## CI/CD
+
+This repository features **fully automated CI/CD** based on conventional commits:
+
+1. **Create PR** with conventional commit messages
+2. **Merge PR** to main branch  
+3. **Automatic Release** happens based on your commit types
+
+No manual changeset creation needed! See [CI_CD_SETUP.md](./CI_CD_SETUP.md) for details.
+
 ## Contributing
 
 We welcome contributions! Please read our [Contributing Guidelines](./CONTRIBUTING.md) for details on:
