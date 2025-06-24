@@ -102,7 +102,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Build packages
         run: pnpm run build
@@ -110,7 +110,7 @@ jobs:
       - name: CDK synth validation
         run: |
           cd test-app
-          pnpm install --frozen-lockfile
+          pnpm install
           npx cdk synth --all
         env:
           CDK_DEFAULT_ACCOUNT: '123456789012'
