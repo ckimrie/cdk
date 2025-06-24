@@ -55,7 +55,22 @@ jobs:
       - name: Build packages
         run: pnpm run build
 
+      - name: Generate changesets from conventional commits
+        run: |
+          echo "🔍 Analyzing conventional commits for automatic changeset generation..."
+          pnpm run auto-changeset
+          
+          # Check if any changesets were generated
+          if [ -n "$(find .changeset -name '*.md' -not -name 'README.md' -not -name 'config.json' -print -quit)" ]; then
+            echo "📝 Changesets generated, proceeding with release..."
+            echo "CHANGESETS_GENERATED=true" >> $GITHUB_ENV
+          else
+            echo "ℹ️ No changesets generated, skipping release"
+            echo "CHANGESETS_GENERATED=false" >> $GITHUB_ENV
+          fi
+
       - name: Create Release Pull Request or Publish to npm
+        if: env.CHANGESETS_GENERATED == 'true'
         id: changesets
         uses: changesets/action@v1
         with:
@@ -68,3 +83,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+
+      - name: No release needed
+        if: env.CHANGESETS_GENERATED == 'false'
+        run: |
+          echo "ℹ️ No conventional commits found that require a release"
+          echo "To trigger a release, ensure your commits follow conventional commit format:"
+          echo "  - feat(vpn): add new feature     → minor version bump"
+          echo "  - fix(vpn): fix bug             → patch version bump" 
+          echo "  - feat(vpn)!: breaking change   → major version bump"

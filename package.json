@@ -28,6 +28,7 @@
     "format:check": "pnpm -r format:check",
     "clean": "pnpm -r clean",
     "changeset": "changeset",
+    "auto-changeset": "node scripts/auto-changeset.js",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"
   },

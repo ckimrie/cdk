@@ -1,6 +1,16 @@
 # CI/CD Setup Guide
 
-This repository uses GitHub Actions for automated CI/CD with the following workflows:
+This repository uses GitHub Actions for **fully automated CI/CD** with the following workflows:
+
+## 🚀 Fully Automatic Release Process
+
+**You simply create PRs with conventional commits and merge them. Everything else is automatic!**
+
+1. **Create PR** with conventional commit messages
+2. **Merge PR** to main branch  
+3. **Automatic Release** happens based on your commit messages
+
+No manual changeset creation needed! 🎉
 
 ## Workflows
 
@@ -14,7 +24,8 @@ Runs on every push and pull request to `main`:
 
 ### 2. Release (`.github/workflows/release.yml`)
 Runs on push to `main` branch:
-- **Automated Versioning**: Uses changesets to determine version bumps based on conventional commits
+- **Auto-Changeset Generation**: Analyzes conventional commits and generates changesets automatically
+- **Automated Versioning**: Determines version bumps based on commit types
 - **NPM Publishing**: Publishes packages to NPM registry with proper provenance
 - **GitHub Releases**: Creates GitHub releases with changelogs
 - **Independent Versioning**: Each package is versioned independently
@@ -40,18 +51,18 @@ Configure these secrets in your GitHub repository:
 
 ## Usage
 
-### Creating a Release
+### Creating a Release (Fully Automatic! 🎉)
 
-1. **Make Changes**: Develop your features following conventional commits
-2. **Add Changeset**: Run `pnpm changeset` to document your changes
-   ```bash
-   pnpm changeset
-   # Select affected packages
-   # Choose version bump type (patch/minor/major)
-   # Write clear description
-   ```
-3. **Commit**: Commit your changeset file
-4. **Merge PR**: When PR is merged to main, release workflow runs automatically
+1. **Make Changes**: Develop your features using conventional commit messages
+2. **Create PR**: Push your branch and create a pull request
+3. **Merge PR**: When PR is merged to main, the release workflow automatically:
+   - Analyzes your conventional commits
+   - Generates appropriate changesets
+   - Versions packages based on commit types
+   - Publishes to NPM
+   - Creates GitHub releases
+
+**No manual steps required!** Just use proper conventional commit format.
 
 ### Package Versioning
 
@@ -60,17 +71,38 @@ Each package follows semantic versioning:
 - **Minor** (0.1.0 → 0.2.0): New features, backward compatible
 - **Major** (0.1.0 → 1.0.0): Breaking changes
 
-### Conventional Commits
+### Conventional Commits (Required for Automatic Releases)
 
-Use conventional commit format for automatic changelog generation:
-```
+Use conventional commit format to trigger automatic releases:
+
+#### Format: `type(scope): description`
+
+```bash
+# Features (minor version bump)
 feat(vpn): add custom CIDR range support
+feat(vpn): add new authentication method
+
+# Bug fixes (patch version bump)  
 fix(vpn): resolve certificate generation issue
+fix(vpn): fix VPC configuration bug
+
+# Breaking changes (major version bump)
+feat(vpn)!: remove deprecated authentication method
+fix(vpn)!: change default CIDR range
+
+# No release triggered
 docs(vpn): update README with examples
 chore: update dependencies
+test(vpn): add integration tests
 ```
 
-Scope should match package name for proper versioning.
+#### Scopes
+- **vpn**: Changes to the VPN package (`@ckimrie/cdk-vpn`)
+- **No scope**: Changes affecting all packages
+
+#### Breaking Changes
+Add `!` after the scope: `feat(vpn)!: breaking change`
+Or include `BREAKING CHANGE:` in the commit body.
 
 ## Local Development
 
