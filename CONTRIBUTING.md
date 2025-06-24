@@ -440,9 +440,9 @@ The construct generates complete .ovpn files with:
 
 ### Getting Help
 
-- 📁 [Issue Tracker](https://github.com/ckimrie/cdk/issues)
-- 💬 [Discussions](https://github.com/ckimrie/cdk/discussions)
-- 📖 [Documentation](https://github.com/ckimrie/cdk/wiki)
+- 📁 [Issue Tracker](https://github.com/ckimrie/vpn/issues)
+- 💬 [Discussions](https://github.com/ckimrie/vpn/discussions)
+- 📖 [Documentation](https://github.com/ckimrie/vpn/wiki)
 
 ### Response Times
 

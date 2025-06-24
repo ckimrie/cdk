@@ -49,8 +49,8 @@ This is a monorepo managed with [pnpm workspaces](https://pnpm.io/workspaces).
 
 ```bash
 # Clone the repository
-git clone https://github.com/ckimrie/cdk.git
-cd cdk
+git clone https://github.com/ckimrie/vpn.git
+cd vpn
 
 # Install dependencies
 pnpm install
@@ -134,6 +134,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- 📁 [Issue Tracker](https://github.com/ckimrie/cdk/issues)
-- 💬 [Discussions](https://github.com/ckimrie/cdk/discussions)
-- 📖 [Documentation](https://github.com/ckimrie/cdk/wiki)
+- 📁 [Issue Tracker](https://github.com/ckimrie/vpn/issues)
+- 💬 [Discussions](https://github.com/ckimrie/vpn/discussions)
+- 📖 [Documentation](https://github.com/ckimrie/vpn/wiki)
