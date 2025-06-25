@@ -5,9 +5,13 @@
  * Analyzes git commits since last release and generates appropriate changeset files
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Get packages from workspace
 function getWorkspacePackages() {
@@ -109,9 +113,13 @@ function getCommitsSinceLastRelease(lastTag) {
       .split('\n')
       .filter(line => line.length > 0)
       .map(line => {
-        const [hash, subject, body] = line.split('|');
-        return { hash, subject, body: body || '' };
-      });
+        const parts = line.split('|');
+        const hash = parts[0] || '';
+        const subject = parts[1] || '';
+        const body = parts.slice(2).join('|') || '';
+        return { hash, subject, body };
+      })
+      .filter(commit => commit.hash && commit.subject);
     
     return commits;
   } catch (error) {
@@ -122,6 +130,10 @@ function getCommitsSinceLastRelease(lastTag) {
 
 // Parse conventional commit
 function parseConventionalCommit(commitSubject) {
+  if (!commitSubject || typeof commitSubject !== 'string') {
+    return null;
+  }
+  
   // Regex for: type(scope): description
   // Also handles: type(scope)!: description for breaking changes
   const conventionalRegex = /^(\w+)(\(([^)]+)\))?(!)?: (.+)$/;
@@ -279,6 +291,6 @@ function main() {
 }
 
 // Run the script
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }

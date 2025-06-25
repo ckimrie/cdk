@@ -1,7 +1,7 @@
 # Contributing to @ckimrie/cdk
 
-Thank you for your interest in contributing to the @ckimrie/cdk monorepo! This document
-provides guidelines and information for contributors working on our collection of AWS CDK constructs.
+Thank you for your interest in contributing to the @ckimrie/cdk monorepo! This document provides
+guidelines and information for contributors working on our collection of AWS CDK constructs.
 
 ## Code of Conduct
 
@@ -61,7 +61,8 @@ This project follows strict TypeScript practices as defined in CLAUDE.md:
 - **No `any` types**: Use `unknown` if type is truly unknown
 - **No type assertions**: Avoid `as SomeType` unless absolutely necessary with clear justification
 - **Prefer `type` over `interface`**: Use `type` for all definitions
-- **Functional programming principles**: Immutable data, pure functions, composition over inheritance
+- **Functional programming principles**: Immutable data, pure functions, composition over
+  inheritance
 - **Schema-first development**: Use Zod or similar for runtime validation and type derivation
 
 #### Naming Conventions
@@ -147,7 +148,7 @@ chore(deps): update AWS CDK to v2.194.0
    pnpm format:check     # Verify formatting
    pnpm test:coverage    # Ensure 100% coverage
    pnpm build            # Verify compilation
-   
+
    # Or for specific package:
    pnpm --filter @ckimrie/cdk-vpn lint
    pnpm --filter @ckimrie/cdk-vpn test:coverage
@@ -200,6 +201,7 @@ Your PR must meet these requirements:
 ### Test Structure
 
 Current test organization:
+
 ```
 packages/
 ├── vpn/
@@ -228,9 +230,9 @@ packages/
 describe('ClientVpnWithCertificateAuth', () => {
   it('should generate VPN endpoint with embedded certificates in ovpn file', () => {
     const vpc = new Vpc(stack, 'TestVpc');
-    
+
     const vpn = new ClientVpnWithCertificateAuth(stack, 'TestVpn', { vpc });
-    
+
     expect(vpn.clientVpnEndpointId).toBeDefined();
     expect(vpn.ovpnFileSecretArn).toBeDefined();
   });
@@ -249,9 +251,7 @@ describe('ClientVpnWithCertificateAuth', () => {
 Use factory functions for consistent test data:
 
 ```typescript
-const getMockCertificateConfig = (
-  overrides?: Partial<CertificateConfig>
-): CertificateConfig => ({
+const getMockCertificateConfig = (overrides?: Partial<CertificateConfig>): CertificateConfig => ({
   organizationName: 'Test Org',
   country: 'US',
   state: 'CA',
@@ -308,6 +308,7 @@ The construct uses Node.js forge library within AWS Lambda for certificate gener
 3. Client Certificates (signed by CA)
 
 **Storage:**
+
 - Root CA and server certificates stored in AWS Certificate Manager (ACM)
 - Client certificates and private keys stored in AWS Systems Manager Parameter Store
 - Complete .ovpn files stored in AWS Secrets Manager
@@ -432,7 +433,8 @@ The construct generates complete .ovpn files with:
 ### Lambda Optimization
 
 - **Memory allocation**: Certificate generator uses 512MB, OVPN generator uses 256MB
-- **Timeout settings**: Appropriate timeouts for certificate operations (10 min) vs file generation (5 min)
+- **Timeout settings**: Appropriate timeouts for certificate operations (10 min) vs file generation
+  (5 min)
 - **Dependency management**: Use only necessary npm dependencies (node-forge)
 - **Error handling**: Comprehensive error handling to avoid infinite retries
 
@@ -450,5 +452,5 @@ The construct generates complete .ovpn files with:
 - Feature requests: Reviewed weekly
 - Security issues: Within 24 hours
 
-Thank you for contributing to @ckimrie/cdk! Your efforts help make AWS CDK constructs more accessible to
-developers worldwide.
+Thank you for contributing to @ckimrie/cdk! Your efforts help make AWS CDK constructs more
+accessible to developers worldwide.

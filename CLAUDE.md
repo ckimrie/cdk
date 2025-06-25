@@ -1241,17 +1241,17 @@ describe('Payment processing', () => {
 
 ```typescript
 // Good - testing user-visible behavior
-describe("PaymentForm", () => {
-  it("should show error when submitting invalid amount", async () => {
+describe('PaymentForm', () => {
+  it('should show error when submitting invalid amount', async () => {
     render(<PaymentForm />);
 
-    const amountInput = screen.getByLabelText("Amount");
-    const submitButton = screen.getByRole("button", { name: "Submit Payment" });
+    const amountInput = screen.getByLabelText('Amount');
+    const submitButton = screen.getByRole('button', { name: 'Submit Payment' });
 
-    await userEvent.type(amountInput, "-100");
+    await userEvent.type(amountInput, '-100');
     await userEvent.click(submitButton);
 
-    expect(screen.getByText("Amount must be positive")).toBeInTheDocument();
+    expect(screen.getByText('Amount must be positive')).toBeInTheDocument();
   });
 });
 ```
