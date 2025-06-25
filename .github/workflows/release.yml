@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
       id-token: write
     
     steps:
@@ -68,20 +67,45 @@ jobs:
             echo "CHANGESETS_GENERATED=false" >> $GITHUB_ENV
           fi
 
-      - name: Create Release Pull Request or Publish to npm
+      - name: Version packages and publish to npm
         if: env.CHANGESETS_GENERATED == 'true'
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: pnpm run version-packages
-          publish: pnpm run release
-          title: 'chore: release packages'
-          commit: 'chore: release packages'
-          createGithubReleases: true
+        run: |
+          echo "📦 Versioning packages..."
+          pnpm run version-packages
+          
+          echo "📤 Publishing to npm..."
+          pnpm run release
+          
+          echo "🏷️ Creating git tag..."
+          # Get the new version from the updated package.json
+          NEW_VERSION=$(node -p "require('./packages/vpn/package.json').version")
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "chore: release v${NEW_VERSION}" || echo "No changes to commit"
+          git tag "v${NEW_VERSION}"
+          git push origin main --tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+
+      - name: Create GitHub Release
+        if: env.CHANGESETS_GENERATED == 'true'
+        run: |
+          NEW_VERSION=$(node -p "require('./packages/vpn/package.json').version")
+          CHANGELOG_CONTENT=""
+          if [ -f "packages/vpn/CHANGELOG.md" ]; then
+            # Extract the latest version's changelog content
+            CHANGELOG_CONTENT=$(sed -n "/^## ${NEW_VERSION}/,/^## /p" packages/vpn/CHANGELOG.md | sed '$d')
+          fi
+          
+          gh release create "v${NEW_VERSION}" \
+            --title "v${NEW_VERSION}" \
+            --notes "${CHANGELOG_CONTENT:-Release v${NEW_VERSION}}" \
+            --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: No release needed
         if: env.CHANGESETS_GENERATED == 'false'
