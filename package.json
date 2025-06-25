@@ -2,6 +2,7 @@
   "name": "@ckimrie/cdk",
   "version": "0.1.0",
   "description": "A collection of AWS CDK constructs for common use cases",
+  "type": "module",
   "private": true,
   "author": "Cameron Kimrie",
   "license": "MIT",

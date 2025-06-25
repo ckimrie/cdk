@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   // Print width - line wrap at 80 characters
   printWidth: 80,
   
