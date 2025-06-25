@@ -9,4 +9,4 @@ node_modules
 cdk.out
 coverage
 .idea
-packages/*/lib/*.tsbuildinfo
+packages/*/tsconfig.tsbuildinfo

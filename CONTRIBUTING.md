@@ -137,7 +137,6 @@ chore(deps): update AWS CDK to v2.194.0
    ```
 
 2. **Make Changes**
-
    - Write code following the standards above
    - Add/update tests for your changes
    - Update documentation as needed
