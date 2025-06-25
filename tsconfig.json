@@ -21,9 +21,9 @@
     "typeRoots": ["./node_modules/@types"]
   },
   "exclude": [
-    "node_modules", 
-    "cdk.out", 
-    "packages/*/lib", 
+    "node_modules",
+    "cdk.out",
+    "packages/*/lib",
     "packages/*/dist",
     "packages/*/coverage",
     "test-app/cdk.out",

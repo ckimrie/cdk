@@ -68,6 +68,14 @@ export default [
     }
   },
   {
+    files: ['test-app/**/*.ts'],
+    rules: {
+      '@typescript-eslint/explicit-member-accessibility': 'off',
+      '@typescript-eslint/strict-boolean-expressions': 'off',
+      '@typescript-eslint/prefer-nullish-coalescing': 'off'
+    }
+  },
+  {
     ignores: [
       'lib/',
       'packages/*/lib/',

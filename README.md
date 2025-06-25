@@ -2,12 +2,13 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A collection of AWS CDK constructs for common use cases, developed from real-world experience working with AWS CDK.
+A collection of AWS CDK constructs for common use cases, developed from real-world experience
+working with AWS CDK.
 
 ## Packages
 
-| Package | Version | Description |
-|---------|---------|-------------|
+| Package                            | Version                                                                                                        | Description                                                    |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | [@ckimrie/cdk-vpn](./packages/vpn) | [![npm version](https://badge.fury.io/js/@ckimrie%2Fcdk-vpn.svg)](https://badge.fury.io/js/@ckimrie%2Fcdk-vpn) | AWS Client VPN construct with automatic certificate management |
 
 ## Quick Start
@@ -24,7 +25,8 @@ pnpm add @ckimrie/cdk-vpn
 
 ### Usage
 
-Each package is self-contained with its own documentation. See the individual package README files for detailed usage instructions.
+Each package is self-contained with its own documentation. See the individual package README files
+for detailed usage instructions.
 
 ```typescript
 // Example: Using the VPN construct
@@ -114,14 +116,15 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
 This repository features **fully automated CI/CD** based on conventional commits:
 
 1. **Create PR** with conventional commit messages
-2. **Merge PR** to main branch  
+2. **Merge PR** to main branch
 3. **Automatic Release** happens based on your commit types
 
 No manual changeset creation needed! See [CI_CD_SETUP.md](./CI_CD_SETUP.md) for details.
 
 ## Contributing
 
-We welcome contributions! Please read our [Contributing Guidelines](./CONTRIBUTING.md) for details on:
+We welcome contributions! Please read our [Contributing Guidelines](./CONTRIBUTING.md) for details
+on:
 
 - Code quality requirements
 - Testing standards

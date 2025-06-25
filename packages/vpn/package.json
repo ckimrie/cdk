@@ -32,7 +32,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w", 
+    "watch": "tsc -w",
     "clean": "rm -rf dist coverage",
     "prepare": "npm run build"
   },

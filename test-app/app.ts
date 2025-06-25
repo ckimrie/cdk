@@ -19,25 +19,25 @@ class TestStack extends cdk.Stack {
         {
           cidrMask: 24,
           name: 'public',
-          subnetType: ec2.SubnetType.PUBLIC,
+          subnetType: ec2.SubnetType.PUBLIC
         },
         {
           cidrMask: 24,
           name: 'private',
-          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-        },
-      ],
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS
+        }
+      ]
     });
 
     // Test default configuration
     new ClientVpnWithCertificateAuth(this, 'DefaultClientVpn', {
-      vpc,
+      vpc
     });
 
     // Test custom CIDR configuration
     new ClientVpnWithCertificateAuth(this, 'CustomCidrClientVpn', {
       vpc,
-      clientCidrBlock: '192.168.0.0/16',
+      clientCidrBlock: '192.168.0.0/16'
     });
   }
 }
@@ -46,8 +46,8 @@ class TestStack extends cdk.Stack {
 new TestStack(app, 'TestStack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT || '123456789012',
-    region: process.env.CDK_DEFAULT_REGION || 'us-east-1',
-  },
+    region: process.env.CDK_DEFAULT_REGION || 'us-east-1'
+  }
 });
 
 app.synth();
