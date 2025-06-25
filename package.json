@@ -25,7 +25,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check --cache=false \"**/*.{ts,tsx,json,md}\"",
     "clean": "pnpm -r clean && rm -rf coverage",
     "changeset": "changeset",
     "auto-changeset": "node scripts/auto-changeset.js",
