@@ -30,13 +30,19 @@ jest.mock('aws-sdk', () => ({
       mockParameters[params.Name] = params.Value;
       return { promise: jest.fn().mockResolvedValue({}) };
     }),
-    getParameter: jest.fn().mockImplementation(params => ({
-      promise: jest.fn().mockResolvedValue({
-        Parameter: {
-          Value: mockParameters[params.Name] || 'mock-value'
-        }
-      })
-    }))
+    getParameter: jest.fn().mockImplementation(params => {
+      const value = mockParameters[params.Name];
+      if (!value) {
+        console.log(`Missing parameter: ${params.Name}`);
+        console.log('Available parameters:', Object.keys(mockParameters));
+        throw new Error(`Parameter ${params.Name} not found in test`);
+      }
+      return {
+        promise: jest.fn().mockResolvedValue({
+          Parameter: { Value: value }
+        })
+      };
+    })
   })),
   EC2: jest.fn().mockImplementation(() => ({
     describeClientVpnEndpoints: jest.fn().mockImplementation(() => ({
@@ -118,6 +124,14 @@ describe('End-to-End Certificate + OVPN Integration', () => {
     // Clear mock state between tests
     Object.keys(mockParameters).forEach(key => delete mockParameters[key]);
     Object.keys(mockSecrets).forEach(key => delete mockSecrets[key]);
+
+    // Mock Date.now() to ensure deterministic resource IDs
+    jest.spyOn(Date.prototype, 'getTime').mockReturnValue(1234567890);
+  });
+
+  afterEach(() => {
+    // Restore Date mock
+    jest.restoreAllMocks();
   });
 
   it('should generate certificates and create working .ovpn file', async () => {
@@ -252,23 +266,8 @@ describe('End-to-End Certificate + OVPN Integration', () => {
     expect(caSection).toBeTruthy();
     expect(certSection).toBeTruthy();
 
-    // Debug: Log the extracted content in CI environment
-    if (process.env.CI) {
-      console.log('CA Section extracted:', caSection![1].substring(0, 100) + '...');
-      console.log('Cert Section extracted:', certSection![1].substring(0, 100) + '...');
-    }
-
-    // Add PEM header/footer if missing (common issue in CI environments)
-    const caPem = caSection![1].trim().startsWith('-----BEGIN CERTIFICATE-----') 
-      ? caSection![1].trim()
-      : `-----BEGIN CERTIFICATE-----\n${caSection![1].trim()}\n-----END CERTIFICATE-----`;
-    
-    const certPem = certSection![1].trim().startsWith('-----BEGIN CERTIFICATE-----')
-      ? certSection![1].trim() 
-      : `-----BEGIN CERTIFICATE-----\n${certSection![1].trim()}\n-----END CERTIFICATE-----`;
-
-    const ovpnCaCert = forge.pki.certificateFromPem(caPem);
-    const ovpnClientCert = forge.pki.certificateFromPem(certPem);
+    const ovpnCaCert = forge.pki.certificateFromPem(caSection![1]);
+    const ovpnClientCert = forge.pki.certificateFromPem(certSection![1]);
 
     // Verify certificates match
     expect(ovpnCaCert.subject.getField('CN').value).toBe(
