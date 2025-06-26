@@ -1,0 +1,8 @@
+#!/bin/sh
+# Validate lockfile consistency
+echo "🔍 Checking lockfile consistency..."
+pnpm run check-lockfile
+
+# Run tests
+echo "🧪 Running tests..."
+pnpm test
