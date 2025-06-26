@@ -1337,16 +1337,18 @@ readability over cleverness.
 When modifying dependencies in any package.json file:
 
 1. **Make your changes** to package.json (add/remove/update dependencies)
-2. **Run `pnpm install`** to update the lockfile 
+2. **Run `pnpm install`** to update the lockfile
 3. **Commit both files together** - package.json AND pnpm-lock.yaml
 4. **Never commit package.json changes without updating the lockfile**
 
 **Why this matters:**
+
 - CI runs with `--frozen-lockfile` flag (production safety)
 - Outdated lockfiles cause `ERR_PNPM_OUTDATED_LOCKFILE` errors
 - Ensures all environments use identical dependency versions
 
 **Pre-commit Protection:**
+
 - Husky pre-commit hook automatically validates lockfile consistency
 - Prevents commits when lockfile is out of sync with package.json changes
 - Run `pnpm run check-lockfile` manually to verify consistency
