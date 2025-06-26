@@ -252,8 +252,23 @@ describe('End-to-End Certificate + OVPN Integration', () => {
     expect(caSection).toBeTruthy();
     expect(certSection).toBeTruthy();
 
-    const ovpnCaCert = forge.pki.certificateFromPem(caSection![1]);
-    const ovpnClientCert = forge.pki.certificateFromPem(certSection![1]);
+    // Debug: Log the extracted content in CI environment
+    if (process.env.CI) {
+      console.log('CA Section extracted:', caSection![1].substring(0, 100) + '...');
+      console.log('Cert Section extracted:', certSection![1].substring(0, 100) + '...');
+    }
+
+    // Add PEM header/footer if missing (common issue in CI environments)
+    const caPem = caSection![1].trim().startsWith('-----BEGIN CERTIFICATE-----') 
+      ? caSection![1].trim()
+      : `-----BEGIN CERTIFICATE-----\n${caSection![1].trim()}\n-----END CERTIFICATE-----`;
+    
+    const certPem = certSection![1].trim().startsWith('-----BEGIN CERTIFICATE-----')
+      ? certSection![1].trim() 
+      : `-----BEGIN CERTIFICATE-----\n${certSection![1].trim()}\n-----END CERTIFICATE-----`;
+
+    const ovpnCaCert = forge.pki.certificateFromPem(caPem);
+    const ovpnClientCert = forge.pki.certificateFromPem(certPem);
 
     // Verify certificates match
     expect(ovpnCaCert.subject.getField('CN').value).toBe(
