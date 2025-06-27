@@ -30,13 +30,19 @@ jest.mock('aws-sdk', () => ({
       mockParameters[params.Name] = params.Value;
       return { promise: jest.fn().mockResolvedValue({}) };
     }),
-    getParameter: jest.fn().mockImplementation(params => ({
-      promise: jest.fn().mockResolvedValue({
-        Parameter: {
-          Value: mockParameters[params.Name] || 'mock-value'
-        }
-      })
-    }))
+    getParameter: jest.fn().mockImplementation(params => {
+      const value = mockParameters[params.Name];
+      if (!value) {
+        console.log(`Missing parameter: ${params.Name}`);
+        console.log('Available parameters:', Object.keys(mockParameters));
+        throw new Error(`Parameter ${params.Name} not found in test`);
+      }
+      return {
+        promise: jest.fn().mockResolvedValue({
+          Parameter: { Value: value }
+        })
+      };
+    })
   })),
   EC2: jest.fn().mockImplementation(() => ({
     describeClientVpnEndpoints: jest.fn().mockImplementation(() => ({
@@ -118,6 +124,14 @@ describe('End-to-End Certificate + OVPN Integration', () => {
     // Clear mock state between tests
     Object.keys(mockParameters).forEach(key => delete mockParameters[key]);
     Object.keys(mockSecrets).forEach(key => delete mockSecrets[key]);
+
+    // Mock Date.now() to ensure deterministic resource IDs
+    jest.spyOn(Date.prototype, 'getTime').mockReturnValue(1234567890);
+  });
+
+  afterEach(() => {
+    // Restore Date mock
+    jest.restoreAllMocks();
   });
 
   it('should generate certificates and create working .ovpn file', async () => {
