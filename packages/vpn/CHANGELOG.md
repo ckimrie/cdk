@@ -1,5 +1,11 @@
 # @ckimrie/cdk-vpn
 
+## 0.2.1
+
+### Patch Changes
+
+- 🐛 update aws-cdk-lib peer dependency to compatible range (#2)
+
 ## 0.2.0
 
 ### Minor Changes
