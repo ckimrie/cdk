@@ -12,14 +12,15 @@ jest.mock('@aws-sdk/client-ec2', () => ({
       ClientVpnEndpoints: [
         {
           ClientVpnEndpointId: 'cvpn-endpoint-12345',
-          DnsName:
-            'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com',
+          DnsName: 'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com',
           Status: { Code: 'available' }
         }
       ]
     })
   })),
-  DescribeClientVpnEndpointsCommand: jest.fn().mockImplementation((input) => input)
+  DescribeClientVpnEndpointsCommand: jest
+    .fn()
+    .mockImplementation(input => input)
 }));
 
 jest.mock('@aws-sdk/client-secrets-manager', () => ({
@@ -30,23 +31,24 @@ jest.mock('@aws-sdk/client-secrets-manager', () => ({
         crypto.randomUUID()
     })
   })),
-  CreateSecretCommand: jest.fn().mockImplementation((input) => input)
+  CreateSecretCommand: jest.fn().mockImplementation(input => input)
 }));
 
 jest.mock('@aws-sdk/client-ssm', () => ({
   SSMClient: jest.fn().mockImplementation(() => ({
-    send: jest.fn().mockImplementation((command) => {
+    send: jest.fn().mockImplementation(command => {
       const paramName = command.input?.Name ?? '';
       return Promise.resolve({
         Parameter: {
-          Value: paramName.includes('private-key') === true
-            ? '-----BEGIN RSA PRIVATE KEY-----\nMOCK_PRIVATE_KEY\n-----END RSA PRIVATE KEY-----'
-            : '-----BEGIN CERTIFICATE-----\nMOCK_CERTIFICATE\n-----END CERTIFICATE-----'
+          Value:
+            paramName.includes('private-key') === true
+              ? '-----BEGIN RSA PRIVATE KEY-----\nMOCK_PRIVATE_KEY\n-----END RSA PRIVATE KEY-----'
+              : '-----BEGIN CERTIFICATE-----\nMOCK_CERTIFICATE\n-----END CERTIFICATE-----'
         }
       });
     })
   })),
-  GetParameterCommand: jest.fn().mockImplementation((input) => ({ input }))
+  GetParameterCommand: jest.fn().mockImplementation(input => ({ input }))
 }));
 
 const getMockOvpnGeneratorEvent = (

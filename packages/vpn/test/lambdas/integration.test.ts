@@ -20,17 +20,19 @@ jest.mock('@aws-sdk/client-acm', () => ({
   ACMClient: jest.fn().mockImplementation(() => ({
     send: jest.fn().mockResolvedValue({
       CertificateArn:
-        'arn:aws:acm:us-east-1:123456789012:certificate/' +
-        crypto.randomUUID()
+        'arn:aws:acm:us-east-1:123456789012:certificate/' + crypto.randomUUID()
     })
   })),
-  ImportCertificateCommand: jest.fn().mockImplementation((input) => input)
+  ImportCertificateCommand: jest.fn().mockImplementation(input => input)
 }));
 
 jest.mock('@aws-sdk/client-ssm', () => ({
   SSMClient: jest.fn().mockImplementation(() => ({
-    send: jest.fn().mockImplementation((command) => {
-      if (command.input?.Name !== undefined && command.input?.Value !== undefined) {
+    send: jest.fn().mockImplementation(command => {
+      if (
+        command.input?.Name !== undefined &&
+        command.input?.Value !== undefined
+      ) {
         // PutParameterCommand
         mockParameters[command.input.Name] = command.input.Value;
         return Promise.resolve({});
@@ -49,8 +51,8 @@ jest.mock('@aws-sdk/client-ssm', () => ({
       return Promise.resolve({});
     })
   })),
-  PutParameterCommand: jest.fn().mockImplementation((input) => ({ input })),
-  GetParameterCommand: jest.fn().mockImplementation((input) => ({ input }))
+  PutParameterCommand: jest.fn().mockImplementation(input => ({ input })),
+  GetParameterCommand: jest.fn().mockImplementation(input => ({ input }))
 }));
 
 jest.mock('@aws-sdk/client-ec2', () => ({
@@ -59,19 +61,20 @@ jest.mock('@aws-sdk/client-ec2', () => ({
       ClientVpnEndpoints: [
         {
           ClientVpnEndpointId: 'cvpn-endpoint-12345',
-          DnsName:
-            'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com',
+          DnsName: 'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com',
           Status: { Code: 'available' }
         }
       ]
     })
   })),
-  DescribeClientVpnEndpointsCommand: jest.fn().mockImplementation((input) => input)
+  DescribeClientVpnEndpointsCommand: jest
+    .fn()
+    .mockImplementation(input => input)
 }));
 
 jest.mock('@aws-sdk/client-secrets-manager', () => ({
   SecretsManagerClient: jest.fn().mockImplementation(() => ({
-    send: jest.fn().mockImplementation((command) => {
+    send: jest.fn().mockImplementation(command => {
       const secretArn =
         'arn:aws:secretsmanager:us-east-1:123456789012:secret:' +
         command.input.Name +
@@ -83,7 +86,7 @@ jest.mock('@aws-sdk/client-secrets-manager', () => ({
       });
     })
   })),
-  CreateSecretCommand: jest.fn().mockImplementation((input) => ({ input }))
+  CreateSecretCommand: jest.fn().mockImplementation(input => ({ input }))
 }));
 
 const getMockCertificateEvent = (): CertificateGeneratorEvent => ({

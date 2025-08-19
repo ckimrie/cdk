@@ -11,18 +11,17 @@ jest.mock('@aws-sdk/client-acm', () => ({
   ACMClient: jest.fn().mockImplementation(() => ({
     send: jest.fn().mockResolvedValue({
       CertificateArn:
-        'arn:aws:acm:us-east-1:123456789012:certificate/' +
-        crypto.randomUUID()
+        'arn:aws:acm:us-east-1:123456789012:certificate/' + crypto.randomUUID()
     })
   })),
-  ImportCertificateCommand: jest.fn().mockImplementation((input) => input)
+  ImportCertificateCommand: jest.fn().mockImplementation(input => input)
 }));
 
 jest.mock('@aws-sdk/client-ssm', () => ({
   SSMClient: jest.fn().mockImplementation(() => ({
     send: jest.fn().mockResolvedValue({})
   })),
-  PutParameterCommand: jest.fn().mockImplementation((input) => input)
+  PutParameterCommand: jest.fn().mockImplementation(input => input)
 }));
 
 const getMockCertificateGeneratorEvent = (
