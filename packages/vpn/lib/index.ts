@@ -2,6 +2,7 @@ import { Construct } from 'constructs';
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as cr from 'aws-cdk-lib/custom-resources';
 import * as path from 'path';
@@ -175,10 +176,12 @@ export class ClientVpnWithCertificateAuth extends Construct {
     }
 
     // Create the singleton function at the stack level
-    const func = new lambda.Function(stack, constructName, {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, 'lambdas', handlerDir)),
+    const func = new NodejsFunction(stack, constructName, {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      bundling: {
+        sourceMap: true,
+      },
+      entry: path.join(__dirname, 'lambdas', handlerDir, "index.ts"),
       timeout: cdk.Duration.minutes(5),
       initialPolicy: options.policies
     });

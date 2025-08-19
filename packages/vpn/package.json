@@ -38,7 +38,8 @@
   },
   "devDependencies": {
     "@types/node-forge": "^1.3.11",
-    "aws-sdk": "^2.1500.0"
+    "aws-sdk": "^2.1500.0",
+    "esbuild": "^0.25.9"
   },
   "peerDependencies": {
     "aws-cdk-lib": "^2.20.0",

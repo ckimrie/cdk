@@ -20,7 +20,7 @@ management and client configuration generation.
 ## Installation
 
 ```bash
-npm install @ckimrie/vpn
+npm install @ckimrie/cdk-vpn
 ```
 
 ## Prerequisites
