@@ -1,9 +1,10 @@
 import * as forge from 'node-forge';
-import * as AWS from 'aws-sdk';
+import { ACMClient, ImportCertificateCommand } from '@aws-sdk/client-acm';
+import { SSMClient, PutParameterCommand } from '@aws-sdk/client-ssm';
 import { CertificateConfig } from './types';
 
-const acm = new AWS.ACM();
-const ssm = new AWS.SSM();
+const acm = new ACMClient({});
+const ssm = new SSMClient({});
 
 export const generateCACertificate = (config: CertificateConfig) => {
   // Generate CA certificate
@@ -176,59 +177,59 @@ export const generateCACertificateAsync = async (config: CertificateConfig) => {
   const clientPrivateKeyPem = forge.pki.privateKeyToPem(clientKeys.privateKey);
 
   // Import certificates to ACM
-  const caImportResult = await acm
-    .importCertificate({
-      Certificate: caCertPem,
-      PrivateKey: caPrivateKeyPem
+  const caImportResult = await acm.send(
+    new ImportCertificateCommand({
+      Certificate: Buffer.from(caCertPem),
+      PrivateKey: Buffer.from(caPrivateKeyPem)
     })
-    .promise();
+  );
 
-  const serverImportResult = await acm
-    .importCertificate({
-      Certificate: serverCertPem,
-      PrivateKey: serverPrivateKeyPem
+  const serverImportResult = await acm.send(
+    new ImportCertificateCommand({
+      Certificate: Buffer.from(serverCertPem),
+      PrivateKey: Buffer.from(serverPrivateKeyPem)
     })
-    .promise();
+  );
 
-  const clientImportResult = await acm
-    .importCertificate({
-      Certificate: clientCertPem,
-      PrivateKey: clientPrivateKeyPem
+  const clientImportResult = await acm.send(
+    new ImportCertificateCommand({
+      Certificate: Buffer.from(clientCertPem),
+      PrivateKey: Buffer.from(clientPrivateKeyPem)
     })
-    .promise();
+  );
 
   // Store certificates in SSM for later use
   const resourceId = `certificate-generator-${new Date().getTime()}`;
 
   await Promise.all([
-    ssm
-      .putParameter({
+    ssm.send(
+      new PutParameterCommand({
         Name: `/vpn/${resourceId}/ca-certificate`,
         Value: caCertPem,
         Type: 'String'
       })
-      .promise(),
-    ssm
-      .putParameter({
+    ),
+    ssm.send(
+      new PutParameterCommand({
         Name: `/vpn/${resourceId}/ca-private-key`,
         Value: caPrivateKeyPem,
         Type: 'SecureString'
       })
-      .promise(),
-    ssm
-      .putParameter({
+    ),
+    ssm.send(
+      new PutParameterCommand({
         Name: `/vpn/${resourceId}/client-certificate`,
         Value: clientCertPem,
         Type: 'String'
       })
-      .promise(),
-    ssm
-      .putParameter({
+    ),
+    ssm.send(
+      new PutParameterCommand({
         Name: `/vpn/${resourceId}/client-private-key`,
         Value: clientPrivateKeyPem,
         Type: 'SecureString'
       })
-      .promise()
+    )
   ]);
 
   return {

@@ -5,45 +5,48 @@ import {
   OvpnGeneratorResult
 } from '../../lib/lambdas/ovpn-generator/types';
 
-// Mock AWS SDK
-jest.mock('aws-sdk', () => ({
-  EC2: jest.fn().mockImplementation(() => ({
-    describeClientVpnEndpoints: jest.fn().mockImplementation(() => ({
-      promise: jest.fn().mockResolvedValue({
-        ClientVpnEndpoints: [
-          {
-            ClientVpnEndpointId: 'cvpn-endpoint-12345',
-            DnsName:
-              'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com',
-            Status: { Code: 'available' }
-          }
-        ]
-      })
-    }))
+// Mock AWS SDK v3
+jest.mock('@aws-sdk/client-ec2', () => ({
+  EC2Client: jest.fn().mockImplementation(() => ({
+    send: jest.fn().mockResolvedValue({
+      ClientVpnEndpoints: [
+        {
+          ClientVpnEndpointId: 'cvpn-endpoint-12345',
+          DnsName:
+            'cvpn-endpoint-12345.prod.clientvpn.us-east-1.amazonaws.com',
+          Status: { Code: 'available' }
+        }
+      ]
+    })
   })),
-  SecretsManager: jest.fn().mockImplementation(() => ({
-    createSecret: jest.fn().mockImplementation(() => ({
-      promise: jest.fn().mockResolvedValue({
-        ARN:
-          'arn:aws:secretsmanager:us-east-1:123456789012:secret:ovpn-file-' +
-          crypto.randomUUID()
-      })
-    }))
+  DescribeClientVpnEndpointsCommand: jest.fn().mockImplementation((input) => input)
+}));
+
+jest.mock('@aws-sdk/client-secrets-manager', () => ({
+  SecretsManagerClient: jest.fn().mockImplementation(() => ({
+    send: jest.fn().mockResolvedValue({
+      ARN:
+        'arn:aws:secretsmanager:us-east-1:123456789012:secret:ovpn-file-' +
+        crypto.randomUUID()
+    })
   })),
-  SSM: jest.fn().mockImplementation(() => ({
-    getParameter: jest.fn().mockImplementation((params: { Name: string }) => ({
-      promise: jest.fn().mockResolvedValue({
+  CreateSecretCommand: jest.fn().mockImplementation((input) => input)
+}));
+
+jest.mock('@aws-sdk/client-ssm', () => ({
+  SSMClient: jest.fn().mockImplementation(() => ({
+    send: jest.fn().mockImplementation((command) => {
+      const paramName = command.input?.Name ?? '';
+      return Promise.resolve({
         Parameter: {
-          Value: params.Name.includes('private-key')
+          Value: paramName.includes('private-key') === true
             ? '-----BEGIN RSA PRIVATE KEY-----\nMOCK_PRIVATE_KEY\n-----END RSA PRIVATE KEY-----'
             : '-----BEGIN CERTIFICATE-----\nMOCK_CERTIFICATE\n-----END CERTIFICATE-----'
         }
-      })
-    }))
+      });
+    })
   })),
-  config: {
-    update: jest.fn()
-  }
+  GetParameterCommand: jest.fn().mockImplementation((input) => ({ input }))
 }));
 
 const getMockOvpnGeneratorEvent = (
