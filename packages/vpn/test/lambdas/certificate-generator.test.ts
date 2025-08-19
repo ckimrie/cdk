@@ -6,25 +6,22 @@ import {
   CertificateGeneratorResult
 } from '../../lib/lambdas/certificate-generator/types';
 
-// Mock AWS SDK
-jest.mock('aws-sdk', () => ({
-  ACM: jest.fn().mockImplementation(() => ({
-    importCertificate: jest.fn().mockImplementation(() => ({
-      promise: jest.fn().mockResolvedValue({
-        CertificateArn:
-          'arn:aws:acm:us-east-1:123456789012:certificate/' +
-          crypto.randomUUID()
-      })
-    }))
+// Mock AWS SDK v3
+jest.mock('@aws-sdk/client-acm', () => ({
+  ACMClient: jest.fn().mockImplementation(() => ({
+    send: jest.fn().mockResolvedValue({
+      CertificateArn:
+        'arn:aws:acm:us-east-1:123456789012:certificate/' + crypto.randomUUID()
+    })
   })),
-  SSM: jest.fn().mockImplementation(() => ({
-    putParameter: jest.fn().mockImplementation(() => ({
-      promise: jest.fn().mockResolvedValue({})
-    }))
+  ImportCertificateCommand: jest.fn().mockImplementation(input => input)
+}));
+
+jest.mock('@aws-sdk/client-ssm', () => ({
+  SSMClient: jest.fn().mockImplementation(() => ({
+    send: jest.fn().mockResolvedValue({})
   })),
-  config: {
-    update: jest.fn()
-  }
+  PutParameterCommand: jest.fn().mockImplementation(input => input)
 }));
 
 const getMockCertificateGeneratorEvent = (

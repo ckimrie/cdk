@@ -1,10 +1,12 @@
 import { OvpnGeneratorEvent, OvpnGeneratorResult } from './types';
 import { extractVpnEndpointDns } from './ovpn-utils';
-import * as AWS from 'aws-sdk';
+import { EC2Client, DescribeClientVpnEndpointsCommand } from '@aws-sdk/client-ec2';
+import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
+import { SecretsManagerClient, CreateSecretCommand } from '@aws-sdk/client-secrets-manager';
 
-const ec2 = new AWS.EC2();
-const ssm = new AWS.SSM();
-const secretsManager = new AWS.SecretsManager();
+const ec2 = new EC2Client({});
+const ssm = new SSMClient({});
+const secretsManager = new SecretsManagerClient({});
 
 export const handler = async (
   event: OvpnGeneratorEvent
@@ -21,11 +23,11 @@ export const handler = async (
       event.ResourceProperties;
 
     // Fetch VPN endpoint details
-    const vpnEndpointResponse = await ec2
-      .describeClientVpnEndpoints({
+    const vpnEndpointResponse = await ec2.send(
+      new DescribeClientVpnEndpointsCommand({
         ClientVpnEndpointIds: [ClientVpnEndpointId]
       })
-      .promise();
+    );
 
     const vpnEndpointDns = extractVpnEndpointDns(
       vpnEndpointResponse.ClientVpnEndpoints || []
@@ -34,22 +36,22 @@ export const handler = async (
     // Retrieve certificates from SSM
     const [caCertResponse, clientCertResponse, clientKeyResponse] =
       await Promise.all([
-        ssm
-          .getParameter({
+        ssm.send(
+          new GetParameterCommand({
             Name: `/vpn/${CertificateResourceId}/ca-certificate`
           })
-          .promise(),
-        ssm
-          .getParameter({
+        ),
+        ssm.send(
+          new GetParameterCommand({
             Name: `/vpn/${CertificateResourceId}/client-certificate`
           })
-          .promise(),
-        ssm
-          .getParameter({
+        ),
+        ssm.send(
+          new GetParameterCommand({
             Name: `/vpn/${CertificateResourceId}/client-private-key`,
             WithDecryption: true
           })
-          .promise()
+        )
       ]);
 
     const caCert = caCertResponse.Parameter!.Value!;
@@ -67,13 +69,13 @@ export const handler = async (
 
     // Store .ovpn file in Secrets Manager
     const secretName = `vpn-config-${ClientVpnEndpointId}-${Date.now()}`;
-    const secretResult = await secretsManager
-      .createSecret({
+    const secretResult = await secretsManager.send(
+      new CreateSecretCommand({
         Name: secretName,
         SecretString: ovpnContent,
         Description: `OpenVPN configuration for Client VPN endpoint ${ClientVpnEndpointId}`
       })
-      .promise();
+    );
 
     return {
       Status: 'SUCCESS',
