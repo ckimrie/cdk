@@ -23,7 +23,8 @@ jest.mock('@aws-sdk/client-acm', () => ({
         'arn:aws:acm:us-east-1:123456789012:certificate/' + crypto.randomUUID()
     })
   })),
-  ImportCertificateCommand: jest.fn().mockImplementation(input => input)
+  ImportCertificateCommand: jest.fn().mockImplementation(input => input),
+  ListCertificatesCommand: jest.fn().mockImplementation(input => input)
 }));
 
 jest.mock('@aws-sdk/client-ssm', () => ({

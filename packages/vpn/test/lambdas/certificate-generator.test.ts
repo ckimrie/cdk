@@ -14,7 +14,8 @@ jest.mock('@aws-sdk/client-acm', () => ({
         'arn:aws:acm:us-east-1:123456789012:certificate/' + crypto.randomUUID()
     })
   })),
-  ImportCertificateCommand: jest.fn().mockImplementation(input => input)
+  ImportCertificateCommand: jest.fn().mockImplementation(input => input),
+  ListCertificatesCommand: jest.fn().mockImplementation(input => input)
 }));
 
 jest.mock('@aws-sdk/client-ssm', () => ({
@@ -243,7 +244,7 @@ describe('Certificate Generator Lambda', () => {
   });
 
   it('should return failure status when certificate generation encounters an error', async () => {
-    // Create an event with a malformed config that would cause certificate generation to fail
+    // Create an event with a missing config that would cause certificate generation to fail
     const invalidEvent = getMockCertificateGeneratorEvent({
       ResourceProperties: {
         Config: null as any // This should cause an error when accessing config properties
@@ -253,9 +254,7 @@ describe('Certificate Generator Lambda', () => {
     const result = (await handler(invalidEvent)) as CertificateGeneratorResult;
 
     expect(result.Status).toBe('FAILED');
-    expect(result.Reason).toBe(
-      "Cannot read properties of null (reading 'keySize')"
-    );
+    expect(result.Reason).toBe('Missing Config in ResourceProperties');
     expect(result.PhysicalResourceId).toBe('certificate-generator-failed');
   });
 

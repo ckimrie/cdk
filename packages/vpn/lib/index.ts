@@ -132,6 +132,9 @@ export class ClientVpnWithCertificateAuth extends Construct {
       }
     );
 
+    // Ensure Client VPN endpoint waits for certificate generation to complete
+    clientVpnEndpoint.node.addDependency(certificateResource);
+
     // Create custom resource for OVPN generation
     const ovpnProvider = this.getOrCreateSingletonProvider(
       'VpnOvpnProvider',
@@ -152,7 +155,9 @@ export class ClientVpnWithCertificateAuth extends Construct {
       }
     });
 
+    // Ensure OVPN generation waits for both VPN endpoint and certificate generation
     ovpnResource.node.addDependency(clientVpnEndpoint);
+    ovpnResource.node.addDependency(certificateResource);
 
     // Set outputs
     this.clientVpnEndpointId = clientVpnEndpoint.ref;
