@@ -7,6 +7,8 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as cr from 'aws-cdk-lib/custom-resources';
 import * as path from 'path';
 
+const isTypeScript = __filename.endsWith('ts')
+
 export interface ClientVpnWithCertificateAuthProps {
   vpc: ec2.IVpc;
   clientCidrBlock?: string;
@@ -181,7 +183,7 @@ export class ClientVpnWithCertificateAuth extends Construct {
       bundling: {
         sourceMap: true,
       },
-      entry: path.join(__dirname, 'lambdas', handlerDir, "index.ts"),
+      entry: path.join(__dirname, 'lambdas', handlerDir, `index.${isTypeScript ? "ts" : "js"}`), // When the code us published to npm it is all JS
       timeout: cdk.Duration.minutes(5),
       initialPolicy: options.policies
     });
