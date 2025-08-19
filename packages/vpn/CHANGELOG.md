@@ -1,5 +1,11 @@
 # @ckimrie/cdk-vpn
 
+## 0.3.2
+
+### Patch Changes
+
+- 🐛 Adds explicit deps between CF resources
+
 ## 0.3.1
 
 ### Patch Changes
