@@ -40,7 +40,7 @@ describe('ClientVpnWithCertificateAuth', () => {
     // Should create Lambda functions for certificate generation (at least one for our custom logic)
     template.resourceCountIs('AWS::Lambda::Function', 4);
     template.hasResourceProperties('AWS::Lambda::Function', {
-      Runtime: 'nodejs18.x',
+      Runtime: 'nodejs20.x',
       Handler: 'index.handler'
     });
 
