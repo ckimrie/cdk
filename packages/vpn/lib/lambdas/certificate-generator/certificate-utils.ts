@@ -232,15 +232,26 @@ export const generateCACertificateAsync = async (config: CertificateConfig) => {
     )
   ]);
 
+  // Validate that all certificate ARNs were returned
+  if (!caImportResult.CertificateArn) {
+    throw new Error('CA certificate import failed - no CertificateArn returned');
+  }
+  if (!serverImportResult.CertificateArn) {
+    throw new Error('Server certificate import failed - no CertificateArn returned');
+  }
+  if (!clientImportResult.CertificateArn) {
+    throw new Error('Client certificate import failed - no CertificateArn returned');
+  }
+
   return {
     CaCertificatePem: caCertPem,
     CaPrivateKeyPem: caPrivateKeyPem,
-    CaCertificateArn: caImportResult.CertificateArn!,
+    CaCertificateArn: caImportResult.CertificateArn,
     ServerCertificatePem: serverCertPem,
     ServerPrivateKeyPem: serverPrivateKeyPem,
-    ServerCertificateArn: serverImportResult.CertificateArn!,
+    ServerCertificateArn: serverImportResult.CertificateArn,
     ClientCertificatePem: clientCertPem,
     ClientPrivateKeyPem: clientPrivateKeyPem,
-    ClientCertificateArn: clientImportResult.CertificateArn!
+    ClientCertificateArn: clientImportResult.CertificateArn
   };
 };
