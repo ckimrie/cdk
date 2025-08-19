@@ -1,5 +1,11 @@
 # @ckimrie/cdk-vpn
 
+## 0.3.1
+
+### Patch Changes
+
+- 🐛 Fixes Certificate arn import errors
+
 ## 0.3.0
 
 ### Minor Changes
