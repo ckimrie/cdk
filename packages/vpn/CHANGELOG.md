@@ -1,5 +1,11 @@
 # @ckimrie/cdk-vpn
 
+## 0.2.2
+
+### Patch Changes
+
+- 🐛 Fixes bug with node-forge bundling (#3)
+
 ## 0.2.1
 
 ### Patch Changes
